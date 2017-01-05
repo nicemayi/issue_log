@@ -29,9 +29,9 @@
         </el-form-item>
         <el-form-item label="Issue Type">
             <el-radio-group style="margin-left: 1%; float: left;" v-model="issue_form.issue_type">
-                <el-radio :label="3">Issue</el-radio>
-                <el-radio :label="6">Complaint</el-radio>
-                <el-radio :label="9">Others</el-radio>
+                <el-radio :label="'issue'">Issue</el-radio>
+                <el-radio :label="'complaint'">Complaint</el-radio>
+                <el-radio :label="'others'">Others</el-radio>
             </el-radio-group>
         </el-form-item>
         <el-form-item label="Description">
@@ -204,19 +204,19 @@
                 departments: [
                     {
                         label: "Lab",
-                        value: "lab"
+                        value: "Lab"
                     },
                     {
                         label: "Accessioning",
-                        value: "accessioning"
+                        value: "Accessioning"
                     },
                     {
                         label: "Billing",
-                        value: "billing"
+                        value: "Billing"
                     },
                     {
                         label: "IT",
-                        value: "it"
+                        value: "IT"
                     },
                 ]
             }
@@ -353,30 +353,19 @@
                 console.log("in get patients");
             },
             onSubmit() {
-                console.log("haha");
-                console.log("is login? ", this.is_login)
-                // console.log(this.$parent.$parent.$parent.$store)
-                console.log(this.$store.state.login_user);
-                console.log(this.current_loggin_user)
-                let {issue_title, issue_from, issue_type, department, description, involved_barcodes, action, notify_to} = this.issue_form;
-                let barcode_split_re = new RegExp("\S");
-                let barcode_array = involved_barcodes.split(barcode_split_re)
-                let department_array = department.map(el=>el);
-                let notify_to_array = notify_to.map(el=>el);
-                this.$notify.error({
-                    title: 'Error',
-                    message: 'This is an error message',
-                    duration: 1500
-                });
+                let {issue_title, issue_from, issue_type, department, description, action, notify_to} = this.issue_form;
+                let barcode_array = this.selectedPatientTable.map(el => {return el.julien_barcode});
+                let create_by = this.current_loggin_user;
                 this.$http.post('/open-new-issue/', {
                     issue_title,
                     issue_from,
                     issue_type,
-                    department_array,
+                    department,
                     description,
                     barcode_array,
                     action,
-                    notify_to_array
+                    notify_to,
+                    create_by
                 }).then(function(res) {
                     console.log("In response: ", res);
                 }).catch(function(err) {
