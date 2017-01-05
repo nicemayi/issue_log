@@ -104,6 +104,7 @@
             <transition name="fade" mode="out-in">
             <div style="margin-left: 140px; cursor: pointer;" v-if="showPossiblePatientTable">
                 <el-table
+                    v-loading="isCalculating"
                     :data="possiblePatientTable"
                     @row-click="selectMe"
                     max-height="250">
@@ -225,18 +226,21 @@
             search_for: function(newVal, oldVal) {
                 if (newVal == '') {
                     this.possiblePatientTable = [];
+                    this.showPossiblePatientTable = false;
                 } else {
                     this.searchQueryIsDirty = true;
+                    this.isCalculating = true;
+                    this.showPossiblePatientTable = true;
                     this.onSearchForPatient();
                 }
             },
-            possiblePatientTable: function(newVal, oldVal) {
-                if (newVal.length == 0) {
-                    this.showPossiblePatientTable = false;
-                } else {
-                    this.showPossiblePatientTable = true;
-                }
-            },
+            // possiblePatientTable: function(newVal, oldVal) {
+            //     if (newVal.length == 0) {
+            //         this.showPossiblePatientTable = false;
+            //     } else {
+            //         this.showPossiblePatientTable = true;
+            //     }
+            // },
             selectedPatientTable: function(newVal, oldVal) {
                 if (newVal.length == 0) {
                     this.showSelectedPatientTable = false;
@@ -314,7 +318,7 @@
             onSearchForPatient: _.debounce(function () {
                 this.isCalculating = true;
                 (function () {
-                    this.isCalculating = false
+                    // this.isCalculating = false
                     this.searchQueryIsDirty = false;
                     console.log("haha");
                     this.getPatients();
@@ -322,6 +326,7 @@
             }, 500),
             getPatients() {
                 let self = this;
+                this.isCalculating = true;
                 let search_for = self.search_for.trim().toUpperCase();
                 if (search_for == "") {
                     self.possiblePatientTable.length = 0;
@@ -339,9 +344,11 @@
                             message: `No record find for your input : ${this.search_for}`,
                             type: 'error'
                         });
+                        this.showPossiblePatientTable = false;
                         return;
                     }
                     self.possiblePatientTable = res;
+                    this.isCalculating = false;
                 }).then(function() {
                     setTimeout(function(){
                         // self.possiblePatientTable = [];
