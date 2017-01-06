@@ -13,7 +13,7 @@
         </ul>
         <form class="navbar-form navbar-right" v-if="is_login">
           <div class="form-group active"><a style="color:white;">Hi {{current_loggin_user}}!&nbsp&nbsp&nbsp</a></div>
-          <button type="submit" class="btn btn-success" @click="logout">Sign Out</button>
+          <button type="submit" class="btn btn-success" @click="logout_btn">Sign Out</button>
         </form>
         <form v-else class="navbar-form navbar-right">
           <div class="form-group">
@@ -22,7 +22,7 @@
           <div class="form-group">
             <input type="password" placeholder="Password" name="password" class="form-control" v-model="login_form.input_password" required>
           </div>
-          <button type="submit" class="btn btn-success" @click.prevent.default="login(login_form.input_username, login_form.input_password)">Sign in</button>
+          <button type="submit" class="btn btn-success" @click.prevent.default="login_btn">Sign in</button>
         </form>
       </div>
     </nav>
@@ -58,13 +58,13 @@ export default {
       login: 'login',
       logout: 'logout'
     }),
-    login() {
+    login_btn() {
       this.$store.dispatch('login', {
         input_username: this.login_form.input_username,
         input_password: this.login_form.input_password
       });
     },
-    logout() {
+    logout_btn() {
       this.$store.dispatch('logout');
     }
   }

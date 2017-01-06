@@ -134,7 +134,7 @@
             </transition>
         </div>
         <el-form-item>
-            <el-button type="primary" @click="onSubmit" :disable="is_login">Create</el-button>
+            <el-button type="primary" @click="onSubmit" :disabled="!is_login">Create</el-button>
             <el-button>Reset</el-button>
         </el-form-item>
     </el-form>
@@ -234,13 +234,7 @@
                     this.onSearchForPatient();
                 }
             },
-            // possiblePatientTable: function(newVal, oldVal) {
-            //     if (newVal.length == 0) {
-            //         this.showPossiblePatientTable = false;
-            //     } else {
-            //         this.showPossiblePatientTable = true;
-            //     }
-            // },
+            
             selectedPatientTable: function(newVal, oldVal) {
                 if (newVal.length == 0) {
                     this.showSelectedPatientTable = false;
@@ -251,19 +245,10 @@
         },
         beforeMount: function() {
             let self = this;
-            self.$http.get('/who/').then(function(res){
-                self.current_loggin_user = res.data;
-                console.log("current_loggin_user", self.current_loggin_user)
-            }, function(err){
-                console.log(err)
-            });
-            // console.log("current_loggin_user: ", this.current_loggin_user);
             self.$http.get('/get-clients/').then(function(res){
-            // console.log("res.data: ", res.data);
-            self.searchSuggestions = JSON.parse(res.data);
+                self.searchSuggestions = JSON.parse(res.data);
             }, function(err){
-            // console.log("fail!");
-            console.log(err)
+            clearImmediate(immediate);onsole.log(err)
             });
         },
         methods: {

@@ -6,143 +6,115 @@
     <div class="well well-lg panel-body">
         <div>
             <h4>
-                This is a <b style="color: red;">complain</b> issue from client <b style="color: red;">1003</b>, opened by <b style="color: red;">Zhe</b> at <b style="color: red;">2016-12:10 15:30:00</b>
+                This is a <b style="color: red;">{{issue_detail.issue_type}}</b> issue from client <b style="color: red;">{{issue_detail.client_id}}</b>, opened by <b style="color: red;">{{issue_detail.create_by}}</b> at <b style="color: red;">{{issue_detail.create_time}}</b>
             </h4>
         </div>
         <div>
             <h3>
-                Description:
+                1. Description:
             </h3>
-            <p>
-                Mr. Karlov had been Russia’s ambassador to Turkey since July 2013, according to a biography on the website of the Russian Embassy.
-                Born in Moscow in 1954, he started his diplomatic career in his early 20s after graduating from the Moscow State Institute of International Relations and the country’s diplomatic academy.
-                Mr. Karlov previously served as the ambassador to North Korea. He was married and had a son. According to Russian news agencies, his wife fainted and was hospitalized after being informed of his death.
-                Richard Moore, the British ambassador to Turkey, described Mr. Karlov in a tweet after the attack as soft-spoken, hospitable and professional.
-            </p>
+            <p>&nbsp&nbsp&nbsp&nbsp{{issue_detail.description}}</p>
         </div>
-        <div>
+        <div v-if="issue_detail.barcodes.length > 0">
             <h3>
-                Involved Patient Sample Barcodes:
+                2. Involved Patient Sample Barcodes:
             </h3>
             <div class="btn-group" role="group" aria-label="Basic example">
-                <button type="button" class="btn btn-secondary" style="margin: 2% 2% 2% 2%;">1612011111</button>
-                <button type="button" class="btn btn-secondary" style="margin: 2% 2% 2% 2%;">1612011111</button>
-                <button type="button" class="btn btn-secondary" style="margin: 2% 2% 2% 2%;">1612011111</button>
-                <button type="button" class="btn btn-secondary" style="margin: 2% 2% 2% 2%;">1612011111</button>
-                <button type="button" class="btn btn-secondary" style="margin: 2% 2% 2% 2%;">1612011111</button>
-                <button type="button" class="btn btn-secondary" style="margin: 2% 2% 2% 2%;">1612011111</button>
-                <button type="button" class="btn btn-secondary" style="margin: 2% 2% 2% 2%;">1612011111</button>
-                <button type="button" class="btn btn-secondary" style="margin: 2% 2% 2% 2%;">1612011111</button>
-                <button type="button" class="btn btn-secondary" style="margin: 2% 2% 2% 2%;">1612011111</button>
-                <button type="button" class="btn btn-secondary" style="margin: 2% 2% 2% 2%;">1612011111</button>
-                <button type="button" class="btn btn-secondary" style="margin: 2% 2% 2% 2%;">1612011111</button>
-                <button type="button" class="btn btn-secondary" style="margin: 2% 2% 2% 2%;">1612011111</button>
+                <button type="button" class="btn btn-secondary" style="margin: 1% 2% 1% 2%;" v-for="barcode in issue_detail.barcodes">{{barcode}}</button>
             </div>
         </div>
+        <div v-else><h3>2. No involved patient samples.</h3></div>
         <div>
-            <h3>
-                Comments:
-            </h3>
-            <ul>
-                <li>
-                    <h4>
-                        2016-12-10 18:00:00 updated by zhe :
-                    </h4>
-                    <p>
-                        This problem is funny and this shoule be a very very very very long sentence. This problem is funny and this shoule be a very very very very long sentence. This problem is funny and this shoule be a very very very very long sentence. This problem is funny and this shoule be a very very very very long sentence.
-                    </p>
-                </li>
-                <li>
-                    <h4>
-                        2016-12-10 18:00:00 updated by zhe :
-                    </h4>
-                    <p>
-                        This problem is funny and this shoule be a very very very very long sentence. This problem is funny and this shoule be a very very very very long sentence. This problem is funny and this shoule be a very very very very long sentence. This problem is funny and this shoule be a very very very very long sentence.
-                    </p>
-                </li>
-                <li>
-                    <h4>
-                        2016-12-10 18:00:00 updated by zhe :
-                    </h4>
-                    <p>
-                        This problem is funny and this shoule be a very very very very long sentence. This problem is funny and this shoule be a very very very very long sentence. This problem is funny and this shoule be a very very very very long sentence. This problem is funny and this shoule be a very very very very long sentence.
-                    </p>
-                </li>
-            </ul>
-        </div>
-        <hr/>
-        <div>
-            <h3>
-                Add Update Actions:
-            </h3>
-            <div class="form-group">
-                <textarea
-                    class="form-control"
-                    rows="5">
-                </textarea>
+            <div v-if="issue_detail.comments.length > 0">
+                <h3>
+                    3. Comments:
+                </h3>
+                <ul>
+                    <li v-for="each_comment in issue_detail.comments">
+                        <h4>
+                            {{each_comment.commented_time}} updated by {{each_comment.commented_by}} :
+                        </h4>
+                        <p>{{each_comment.comment_content}}</p>
+                    </li>
+                </ul>
             </div>
-            <button type="submit" class="btn btn-default">Submit Updates</button>
+            <div v-else>
+                <h3>
+                    3. Currently No Comments On This Issue.
+                </h3>
+            </div>
         </div>
         <hr/>
-        <div>
-            <h3>Add Department / Send notifications</h3>
+        <div v-if="issue_detail.is_closed == '0'">
+            <div>
+                <h3>
+                    Add Update Actions:
+                </h3>
+                <div class="form-group">
+                    <textarea
+                        class="form-control"
+                        rows="5">
+                    </textarea>
+                </div>
+                <button type="submit" class="btn btn-default">Submit Updates</button>
+            </div>
             <hr/>
             <div>
+                <h3>Add Department / Send notifications</h3>
+                <hr/>
                 <div>
-                    <el-form ref="form">
-                        <el-form-item width="50%">
-                            <el-select v-model="add_department_or_person" multiple placeholder="Select" style="width: 30%;">
-                                <el-option-group
-                                    v-for="group in groups"
-                                    :label="group.label">
-                                    <el-option
-                                        v-for="person in group.persons"
-                                        :label="person.label"
-                                        :value="person.value">
-                                    </el-option>
-                                </el-option-group>
-                            </el-select>
-                        </el-form-item style="float:left;">
-                        <el-form-item>
-                            <el-button type="default">Add Related Departments/Persons</el-button>
-                        </el-form-item>
-                    </el-form>
-                    <el-button type="danger" style="float:right;">Close Issue?</el-button>
+                    <div>
+                        <el-form ref="form">
+                            <el-form-item width="50%">
+                                <el-select v-model="add_department_or_person" multiple placeholder="Select" style="width: 30%;">
+                                    <el-option-group
+                                        v-for="group in groups"
+                                        :label="group.label">
+                                        <el-option
+                                            v-for="person in group.persons"
+                                            :label="person.label"
+                                            :value="person.value">
+                                        </el-option>
+                                    </el-option-group>
+                                </el-select>
+                            </el-form-item style="float:left;">
+                            <el-form-item>
+                                <el-button type="default">Add Related Departments/Persons</el-button>
+                            </el-form-item>
+                        </el-form>
+                        <el-button type="danger" style="float:right;">Close Issue?</el-button>
+                    </div>
                 </div>
             </div>
+            <br>
+            <br>
         </div>
-        <br>
-        <br>
         <hr class="seperate_relations"/>
         <div></div>
         <div>
             <h5>
                 Related to the following departments:
             </h5>
-            <span class="label label-info">Assessioning</span>
-            <span class="label label-success">Lab</span>
-            <span class="label label-info">Assessioning</span>
-            <span class="label label-success">Lab</span>
-            <span class="label label-info">Assessioning</span>
-            <span class="label label-success">Lab</span>
+            <span style="margin-right: 1%;" class="label label-info" v-for="each_department in issue_detail.departments">{{each_department}}</span>
         </div>
         <br/>
         <div>
             <h5>
                 This issue has been notified to:
             </h5>
-            <span class="label label-info">Zhe</span>
-            <span class="label label-success">Wang</span>
+            <span style="margin-right: 1%;" class="label label-info" v-for="each_user in issue_detail.notifications">{{each_user}}</span>
         </div>
     </div>
 </template>
 
 <script>
     export default {
-        props: ['issue_number'],
+        props: ['issue_detail'],
+        beforeMount: function() {
+
+        },
         mounted() {
-            console.log("From component issuedetail: ", this.issue_number);
-            this.links = this.loadAll();
+
         },
         data () {
             return {
