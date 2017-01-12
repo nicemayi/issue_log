@@ -46,11 +46,57 @@
         <el-form-item label="Department">
             <el-select  style="float: left; width: 100%;" multiple placeholder="Select" v-model="issue_form.department">
                 <el-option
-                    v-for="each_department in departments"
+                    v-for="each_department in departments_option"
                     :label="each_department.label"
                     :value="each_department.value">
                 </el-option>
             </el-select>
+        </el-form-item>
+        <el-form-item label="Involved Samples" v-if="showSelectedPatientTable" style="cursor: pointer;">
+            <div>
+                <el-table
+                    :data="selectedPatientTable"
+                    max-height="250"
+                    @row-click="removeMe"
+                    row-class-name="positive-row">
+                    <el-table-column
+                        prop="patient_fullname"
+                        label="Full Name"
+                        align="left">
+                    </el-table-column>
+                    <el-table-column
+                        prop="patient_dos"
+                        label="DoS"
+                        align="center">
+                    </el-table-column>
+                    <el-table-column
+                        prop="patient_bd"
+                        label="DoB"
+                        align="center">
+                    </el-table-column>
+                    <el-table-column
+                        prop="patient_gender"
+                        label="Gender"
+                        align="center">
+                    </el-table-column>
+                    <el-table-column
+                        prop="julien_barcode"
+                        label="Julien Barcode"
+                        align="center">
+                    </el-table-column>
+                    <el-table-column
+                        prop="sample_id"
+                        label="Sample ID"
+                        align="center">
+                    </el-table-column>
+                    <el-table-column
+                        prop="client_name"
+                        label="Client Name"
+                        align="center">
+                    </el-table-column>
+                </el-table>
+                <hr>
+            </div>
         </el-form-item>
         <div>
             <el-form-item label="Search Patients">
@@ -106,55 +152,9 @@
             </div>
             </transition>
         </div>
-        <el-form-item label="Involved Samples" v-if="showSelectedPatientTable" style="cursor: pointer;">
-            <div>
-                <el-table
-                    :data="selectedPatientTable"
-                    max-height="250"
-                    @row-click="removeMe"
-                    row-class-name="positive-row">
-                    <el-table-column
-                        prop="patient_fullname"
-                        label="Full Name"
-                        align="left">
-                    </el-table-column>
-                    <el-table-column
-                        prop="patient_dos"
-                        label="DoS"
-                        align="center">
-                    </el-table-column>
-                    <el-table-column
-                        prop="patient_bd"
-                        label="DoB"
-                        align="center">
-                    </el-table-column>
-                    <el-table-column
-                        prop="patient_gender"
-                        label="Gender"
-                        align="center">
-                    </el-table-column>
-                    <el-table-column
-                        prop="julien_barcode"
-                        label="Julien Barcode"
-                        align="center">
-                    </el-table-column>
-                    <el-table-column
-                        prop="sample_id"
-                        label="Sample ID"
-                        align="center">
-                    </el-table-column>
-                    <el-table-column
-                        prop="client_name"
-                        label="Client Name"
-                        align="center">
-                    </el-table-column>
-                </el-table>
-                <hr>
-            </div>
-        </el-form-item>
         <el-form-item>
             <el-button type="primary" @click="onSubmit" :disabled="!is_login">Create</el-button>
-            <el-button>Reset</el-button>
+            <!-- <el-button @click="clearAllForm">Reset</el-button> -->
         </el-form-item>
     </el-form>
 </template>
@@ -206,7 +206,7 @@
                     description: '',
                     action: '',
                 },
-                departments: [
+                departments_option: [
                     {
                         label: "Lab",
                         value: "Lab"
@@ -238,7 +238,6 @@
                     this.onSearchForPatient();
                 }
             },
-            
             selectedPatientTable: function(newVal, oldVal) {
                 if (newVal.length == 0) {
                     this.showSelectedPatientTable = false;
@@ -273,7 +272,7 @@
                 };
             },
             handleSelect(item) {
-            console.log("Select :", item);
+                console.log("Select :", item);
             },
             handleSelectClient(item) {
                 let self = this;
@@ -289,11 +288,6 @@
                 this.selectedPatientTable.splice(inx, 1);
             },
             selectMe(row, event, column) {
-                console.log("selectMe");
-                console.log("row", row);
-                console.log("event", event);
-                console.log("column", column);
-                console.log(row.julien_barcode)
                 if (this.selectedPatientTable.filter(el => {
                     return el.julien_barcode == row.julien_barcode
                 }).length == 0) {
@@ -353,6 +347,7 @@
             },
             clearAllForm() {
                 let self = this;
+                console.log(self.departments_option)
                 self.showPossiblePatientTable = false;
                 self.showSelectedPatientTable = false;
                 self.searchForClient = '';
@@ -374,9 +369,29 @@
                     action: '',
                 };
             },
+            forceUpdate() {
+                this.$forceUpdate();
+            },
             onSubmit() {
                 let self = this;
                 let {issue_title, issue_from, issue_type, department, description, action} = self.issue_form;
+                if (issue_title.trim() == '') {
+                    self.$message.error('Please input issue title.');
+                    return;
+                }
+                if (issue_from.client_id == '') {
+                    self.$message.error('Please denote where is this issue from.');
+                    return;
+                }
+                if (issue_type == '') {
+                    self.$message.error('Please select a issue type.');
+                    return;
+                }
+                if (department == '') {
+                    self.$message.error('Please select any department you want to notifify.');
+                    return;
+                }
+                console.log("issue_from.issue_type: ", issue_from.issue_type);
                 let barcode_array = self.selectedPatientTable.map(el => {return el.julien_barcode});
                 let create_by = self.current_loggin_user;
                 self.$http.post('/open-new-issue/', {
@@ -390,8 +405,18 @@
                     create_by
                 }).then(function(res) {
                     console.log("In response: ", res);
-                    self.clearAllForm();
-                    self.reload();
+                    if (res.body == "success") {
+                        self.$message({
+                          message: 'You opened a new issue.',
+                          type: 'success'
+                        });
+                        self.reload();
+                    } else if (res.body == "fail") {
+                        self.$message({
+                          message: 'You are trying to submit too fast. Try again in 1 minute laster.',
+                          type: 'error'
+                        });
+                    }
                 }).catch(function(err) {
                     console.log("In error: ", err);
                 })
