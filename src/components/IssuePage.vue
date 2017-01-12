@@ -90,7 +90,7 @@
 <script>
     import IssueDiv from './IssueDiv'
     import NewIssue from './NewIssue'
-    import { mapGetters } from 'vuex'
+    import { mapGetters, mapActions} from 'vuex'
     export default {
         components: {NewIssue, IssueDiv},
         computed: {
@@ -125,12 +125,12 @@
             }
         },
         beforeMount: function() {
-
+            // this.authUser();
         },
         methods: {
-            // ...mapActions({
-            //   sort_issues: 'sort_issues',
-            // }),
+            ...mapActions({
+              authUser: 'authUser',
+            }),
             handleCommand(command) {
                 if (command == "issue number") {
                     this.issues.sort(this.compare_by_number);

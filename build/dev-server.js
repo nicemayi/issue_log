@@ -69,6 +69,7 @@ app.use(proxyMiddleware('/close-issue/', {target: 'http://localhost:5000'}))
 app.use(proxyMiddleware('/re-open-issue/', {target: 'http://localhost:5000'}))
 app.use(proxyMiddleware('/remove-departments/', {target: 'http://localhost:5000'}))
 app.use(proxyMiddleware('/remove-users/', {target: 'http://localhost:5000'}))
+app.use(proxyMiddleware('/is-admin/', {target: 'http://localhost:5000'}))
 /////////////////////////////////////////////////////////////////////////
 
 // serve pure static assets

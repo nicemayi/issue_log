@@ -74,29 +74,48 @@ export const store = new Vuex.Store({
             Vue.http.get('/related-issues/').then(function(res){
                 let issues = JSON.parse(res.data);
                 state.issues = issues;
-                // console.log(issues[0].issue_title);
-                // console.log("successfully get issues: ", issues);
             }, function(err){
                 console.log("Error in login get-related-issues")
             });
             Vue.http.get('/related-groups/').then(function(res){
                 let groups = JSON.parse(res.data);
                 state.groups = groups;
-                // console.log(groups);
-                // console.log("successfully get groups: ", groups);
             }, function(err){
                 console.log("Error in login get-related-groups")
             });
         },
-        // sort_issues: (state, command) => {
-        //     if (command.sortby == "issue number") {
-        //         console.log("Issue sort by issue number");
-        //     } else if (command.sortby == "issue open date") {
-        //         console.log("Issue sort by issue open date");
-        //     } else if (command.sortby == "issue opened by") {
-        //         console.log("Issue sort by issue opened by");
-        //     }
-        // }
+        authUser: state => {
+            console.log("auth");
+            Vue.http.get('/who/').then(res => {
+                state.login_user = res.data;
+                if (res.data != '') {
+                    state.is_login = true;
+                    Vue.http.get('/is-admin/').then(res => {
+                        state.is_admin = (res.data == 'true') ? true: false;
+                        Vue.http.get('/related-issues/').then(function(res){
+                            let issues = JSON.parse(res.data);
+                            state.issues = issues;
+                        }, function(err){
+                            console.log("Error in login get-related-issues")
+                        });
+                        Vue.http.get('/related-groups/').then(function(res){
+                            let groups = JSON.parse(res.data);
+                            state.groups = groups;
+                            // console.log(groups);
+                            // console.log("successfully get groups: ", groups);
+                        }, function(err){
+                            console.log("Error in login get-related-groups")
+                        });
+                    }, err => {
+                        console.log("err");
+                    })
+                } else {
+                    state.is_login = false;
+                }
+            }, err => {
+                console.log(err);
+            })
+        }
     },
     actions: {
         login: ({ commit }, login_form) => {
@@ -110,6 +129,9 @@ export const store = new Vuex.Store({
         },
         reload: ({ commit }) => {
             commit("reload");
+        },
+        authUser: ({ commit }) => {
+            commit("authUser");
         }
     }
 })
