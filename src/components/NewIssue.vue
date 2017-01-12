@@ -20,8 +20,6 @@
                 v-model="searchForClient"
                 :fetch-suggestions="querySearchClient"
                 custom-item="client-id"
-                :trigger-on-focus="false"
-                :autofocus="true"
                 placeholder="You can search for ID number or name..."
                 @select="handleSelectClient"
                 style="width: 100%;">
@@ -46,53 +44,13 @@
             <el-input type="textarea" placeholder="Please input any required actions." v-model="issue_form.action"></el-input>
         </el-form-item>
         <el-form-item label="Department">
-            <el-select multiple placeholder="Select" v-model="issue_form.department">
+            <el-select  style="float: left; width: 100%;" multiple placeholder="Select" v-model="issue_form.department">
                 <el-option
                     v-for="each_department in departments"
                     :label="each_department.label"
                     :value="each_department.value">
                 </el-option>
             </el-select>
-        </el-form-item>
-        <el-form-item label="Notifify To">
-            <el-select multiple placeholder="Select" v-model="issue_form.notify_to">
-                <el-option
-                    v-for="each_people in people"
-                    :label="each_people.label"
-                    :value="each_people.value">
-                </el-option>
-            </el-select>
-        </el-form-item>
-        <el-form-item label="Involved Samples" v-if="showSelectedPatientTable" style="cursor: pointer;">
-            <div>
-                <el-table
-                    :data="selectedPatientTable"
-                    max-height="250"
-                    @row-click="removeMe"
-                    row-class-name="positive-row">
-                    <el-table-column
-                        prop="patient_fullname"
-                        label="Patient Full-name"
-                        align="left">
-                    </el-table-column>
-                    <el-table-column
-                        prop="patient_dos"
-                        label="Patient Date Of Service"
-                        align="center">
-                    </el-table-column>
-                    <el-table-column
-                        prop="patient_bd"
-                        label="Patient Date of Birth"
-                        align="center">
-                    </el-table-column>
-                    <el-table-column
-                        prop="julien_barcode"
-                        label="Julien Barcode"
-                        align="center">
-                    </el-table-column>
-                </el-table>
-                <hr>
-            </div>
         </el-form-item>
         <div>
             <el-form-item label="Search Patients">
@@ -102,7 +60,7 @@
                 </el-input>
             </el-form-item label="Possible Patients">
             <transition name="fade" mode="out-in">
-            <div style="margin-left: 140px; cursor: pointer;" v-if="showPossiblePatientTable">
+            <div style="margin-left: 140px; cursor: pointer;" v-if="possiblePatientTable.length > 0">
                 <el-table
                     v-loading="isCalculating"
                     :data="possiblePatientTable"
@@ -110,17 +68,22 @@
                     max-height="250">
                     <el-table-column
                         prop="patient_fullname"
-                        label="Patient Full-name"
+                        label="Full Name"
                         align="left">
                     </el-table-column>
                     <el-table-column
                         prop="patient_dos"
-                        label="Patient Date Of Service"
+                        label="DoS"
                         align="center">
                     </el-table-column>
                     <el-table-column
                         prop="patient_bd"
-                        label="Patient Date of Birth"
+                        label="DoB"
+                        align="center">
+                    </el-table-column>
+                    <el-table-column
+                        prop="patient_gender"
+                        label="Gender"
                         align="center">
                     </el-table-column>
                     <el-table-column
@@ -128,11 +91,67 @@
                         label="Julien Barcode"
                         align="center">
                     </el-table-column>
+                    <el-table-column
+                        prop="sample_id"
+                        label="Sample ID"
+                        align="center">
+                    </el-table-column>
+                    <el-table-column
+                        prop="client_name"
+                        label="Client Name"
+                        align="center">
+                    </el-table-column>
                 </el-table>
                 <hr>
             </div>
             </transition>
         </div>
+        <el-form-item label="Involved Samples" v-if="showSelectedPatientTable" style="cursor: pointer;">
+            <div>
+                <el-table
+                    :data="selectedPatientTable"
+                    max-height="250"
+                    @row-click="removeMe"
+                    row-class-name="positive-row">
+                    <el-table-column
+                        prop="patient_fullname"
+                        label="Full Name"
+                        align="left">
+                    </el-table-column>
+                    <el-table-column
+                        prop="patient_dos"
+                        label="DoS"
+                        align="center">
+                    </el-table-column>
+                    <el-table-column
+                        prop="patient_bd"
+                        label="DoB"
+                        align="center">
+                    </el-table-column>
+                    <el-table-column
+                        prop="patient_gender"
+                        label="Gender"
+                        align="center">
+                    </el-table-column>
+                    <el-table-column
+                        prop="julien_barcode"
+                        label="Julien Barcode"
+                        align="center">
+                    </el-table-column>
+                    <el-table-column
+                        prop="sample_id"
+                        label="Sample ID"
+                        align="center">
+                    </el-table-column>
+                    <el-table-column
+                        prop="client_name"
+                        label="Client Name"
+                        align="center">
+                    </el-table-column>
+                </el-table>
+                <hr>
+            </div>
+        </el-form-item>
         <el-form-item>
             <el-button type="primary" @click="onSubmit" :disabled="!is_login">Create</el-button>
             <el-button>Reset</el-button>
@@ -143,7 +162,7 @@
 <script>
     import _ from 'lodash'
     import Vue from 'vue';
-    import { mapGetters } from 'vuex'
+    import { mapGetters, mapActions} from 'vuex'
     Vue.component('client-id', {
         functional: true,
         render: function (h, ctx){
@@ -186,22 +205,7 @@
                     department: '',
                     description: '',
                     action: '',
-                    notify_to: ''
                 },
-                people: [
-                    {
-                        label: "Zhe Wang",
-                        value: "zhe"
-                    },
-                    {
-                        label: "Tianhao Wang",
-                        value: "wang"
-                    },
-                    {
-                        label: "Ethan Liu",
-                        value: "ethan"
-                    }
-                ],
                 departments: [
                     {
                         label: "Lab",
@@ -252,6 +256,9 @@
             });
         },
         methods: {
+            ...mapActions({
+                reload: 'reload'
+            }),
             querySearchClient(queryString, cb) {
                 var searchSuggestions = this.searchSuggestions;
                 var results = queryString ? searchSuggestions.filter(this.createFilterClient(queryString)) : searchSuggestions;
@@ -336,19 +343,43 @@
                     this.isCalculating = false;
                 }).then(function() {
                     setTimeout(function(){
-                        // self.possiblePatientTable = [];
-                    }, 30000)
+                        self.possiblePatientTable = [];
+                    }, 5000)
                 })
                 .catch(err => {
                     console.log("Error is ", err);
                 })
                 console.log("in get patients");
             },
+            clearAllForm() {
+                let self = this;
+                self.showPossiblePatientTable = false;
+                self.showSelectedPatientTable = false;
+                self.searchForClient = '';
+                self.possiblePatientTable = [];
+                self.selectedPatientTable = [];
+                self.search_for = '';
+                self.searchQueryIsDirty = false;
+                self.isCalculating = false;
+                self.issue_form = {
+                    issue_title: '',
+                    issue_from: {
+                        "client_id": '',
+                        "client_practice_name": '',
+                        "client_name": ''
+                    },
+                    issue_type: '',
+                    department: '',
+                    description: '',
+                    action: '',
+                };
+            },
             onSubmit() {
-                let {issue_title, issue_from, issue_type, department, description, action, notify_to} = this.issue_form;
-                let barcode_array = this.selectedPatientTable.map(el => {return el.julien_barcode});
-                let create_by = this.current_loggin_user;
-                this.$http.post('/open-new-issue/', {
+                let self = this;
+                let {issue_title, issue_from, issue_type, department, description, action} = self.issue_form;
+                let barcode_array = self.selectedPatientTable.map(el => {return el.julien_barcode});
+                let create_by = self.current_loggin_user;
+                self.$http.post('/open-new-issue/', {
                     issue_title,
                     issue_from,
                     issue_type,
@@ -356,10 +387,11 @@
                     description,
                     barcode_array,
                     action,
-                    notify_to,
                     create_by
                 }).then(function(res) {
                     console.log("In response: ", res);
+                    self.clearAllForm();
+                    self.reload();
                 }).catch(function(err) {
                     console.log("In error: ", err);
                 })

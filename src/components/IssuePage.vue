@@ -1,4 +1,4 @@
-<style>
+<style >
     .list-group-item {
         margin-top: 0%;
         margin-bottom: 0%;
@@ -74,11 +74,11 @@
                                     <el-dropdown-item command="issue opened by">Open-By</el-dropdown-item>
                                 </el-dropdown-menu>
                             </el-dropdown>
-                                <input placeholder="Search..." type="text" class="form-control input-lg" style="width: 30%;">
+                                <input v-model="search_issue_number" placeholder="Search for issue number or title..." type="text" class="form-control input-lg" style="width: 50%;">
                             </div>
                         </form>
                     </div>
-                    <issue-div></issue-div>
+                    <issue-div :issues_prop="filtered_issues"></issue-div>
             </el-tab-pane>
             <el-tab-pane label="Open New Issue" align="center">
                 <new-issue></new-issue>
@@ -109,11 +109,23 @@
                     return el.is_closed == 0;
                 }).length;
             },
+            filtered_issues: function() {
+                return this.issues.filter(el => {
+                    let isIncludingNumber = el.issue_number.includes(this.search_issue_number.trim().toUpperCase());
+                    let isIncludingTitle = el.title.includes(this.search_issue_number.trim());
+                    // console.log("isIncludingTitle: ", isIncludingTitle)
+                    // let isIncludingTitle = false;
+                    return (isIncludingNumber || isIncludingTitle);
+                });
+            }
         },
         data() {
             return {
-
+                search_issue_number: '',
             }
+        },
+        beforeMount: function() {
+
         },
         methods: {
             // ...mapActions({
@@ -138,9 +150,9 @@
             },
             compare_by_open_date(a,b) {
                 if (a.create_time < b.create_time)
-                    return -1;
-                if (a.create_time > b.create_time)
                     return 1;
+                if (a.create_time > b.create_time)
+                    return -1;
                 return 0;
             },
             compare_by_opener(a,b) {

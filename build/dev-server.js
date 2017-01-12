@@ -63,6 +63,12 @@ app.use(proxyMiddleware('/inquiry-patient/', {target: 'http://localhost:5000'}))
 app.use(proxyMiddleware('/get-clients/', {target: 'http://localhost:5000'}))
 app.use(proxyMiddleware('/logout-from-issue/', {target: 'http://localhost:5000'}))
 app.use(proxyMiddleware('/related-issues/', {target: 'http://localhost:5000'}))
+app.use(proxyMiddleware('/related-groups/', {target: 'http://localhost:5000'}))
+app.use(proxyMiddleware('/update-issue/', {target: 'http://localhost:5000'}))
+app.use(proxyMiddleware('/close-issue/', {target: 'http://localhost:5000'}))
+app.use(proxyMiddleware('/re-open-issue/', {target: 'http://localhost:5000'}))
+app.use(proxyMiddleware('/remove-departments/', {target: 'http://localhost:5000'}))
+app.use(proxyMiddleware('/remove-users/', {target: 'http://localhost:5000'}))
 /////////////////////////////////////////////////////////////////////////
 
 // serve pure static assets

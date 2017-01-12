@@ -9,7 +9,7 @@
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
         <ul class="nav navbar-nav">
-          <li class="active"><a>Home</a></li>
+          <li class="active"><a href='/'>Home Page</a></li>
         </ul>
         <form class="navbar-form navbar-right" v-if="is_login">
           <div class="form-group active"><a style="color:white;">Hi {{current_loggin_user}}!&nbsp&nbsp&nbsp</a></div>

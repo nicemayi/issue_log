@@ -15,7 +15,7 @@ Vue.use(VueRouter);
 Vue.use(VueResource);
 Vue.use(ElementUI, { locale })
 
-console.log("in here: ", store)
+// console.log("in here: ", store)
 
 /* eslint-disable no-new */
 new Vue({
