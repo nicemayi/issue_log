@@ -34,6 +34,7 @@
 
 import Issues from './components/IssuePage';
 import { mapActions, mapGetters } from 'vuex'
+// import { userAuthentication } from './store/actions'
 export default {
   name: 'app',
   components: {
@@ -47,6 +48,10 @@ export default {
       }
     }
   },
+  created: function() {
+    this.userAuthentication();
+  },
+
   computed: {
     ...mapGetters({
       current_loggin_user: 'get_login_user',
@@ -56,7 +61,8 @@ export default {
   methods: {
     ...mapActions({
       login: 'login',
-      logout: 'logout'
+      logout: 'logout',
+      userAuthentication: 'userAuthentication'
     }),
     login_btn() {
       this.$store.dispatch('login', {
