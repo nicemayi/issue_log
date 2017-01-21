@@ -71,7 +71,7 @@ export default {
       });
     },
     logout_btn() {
-      this.$store.dispatch('logout');
+      this.logout();
     }
   }
 }

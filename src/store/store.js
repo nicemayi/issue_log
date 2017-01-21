@@ -35,7 +35,7 @@ export const store = new Vuex.Store({
       state.is_admin = admin ? true : false;
       store.commit('load_issues');
     },
-    load_issues(state) {
+    load_issues: state => {
       Vue.http.get('/related-issues/').then(function (res) {
         let issues = JSON.parse(res.data);
         state.issues = issues;
@@ -72,14 +72,10 @@ export const store = new Vuex.Store({
       });
     },
     logout: state => {
-      Vue.http.get('/logout-from-issue/').then(res => {
         state.login_user = '';
         state.is_login = false;
         state.is_admin = false;
         state.groups.length = 0;
-      }, err => {
-        console.log("In err");
-      });
     },
     reload: state => {
       Vue.http.get('/related-issues/').then(function (res) {
@@ -137,7 +133,11 @@ export const store = new Vuex.Store({
     logout: ({
       commit
     }) => {
-      commit("logout");
+      Vue.http.get('/logout-from-issue/').then(res => {
+          commit("logout");
+      }, err => {
+        console.log("In err");
+      });
     },
     sort_issues: ({
       commit
