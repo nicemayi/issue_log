@@ -3,7 +3,7 @@
 </style>
 
 <template id="bs-modal">
-    <!-- MODAL -->    
+    <!-- MODAL -->
     <div class="modal zoom" :id="removeModalIndex" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -25,7 +25,7 @@
 
 <script>
   import { mapActions } from 'vuex';
-  import { alert } from 'vue-strap'
+  // import { alert } from 'vue-strap'
   export default {
     template: '#bs-modal',
     props: ["issueNumber", "removeModelUser", "operator", "removeModalIndex"],

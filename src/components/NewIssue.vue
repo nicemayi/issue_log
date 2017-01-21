@@ -106,7 +106,7 @@
                 </el-input>
             </el-form-item label="Possible Patients">
             <transition name="fade" mode="out-in">
-            <div style="margin-left: 140px; cursor: pointer;" v-if="possiblePatientTable.length > 0">
+            <div style="margin-left: 140px; cursor: pointer;" v-show="showPossiblePatientTable">
                 <el-table
                     v-loading="isCalculating"
                     :data="possiblePatientTable"
@@ -301,29 +301,26 @@
                 }
                 console.log(this.selectedPatientTable);
             },
-            onSearchForPatient: _.debounce(function () {
-                this.isCalculating = true;
-                (function () {
-                    // this.isCalculating = false
-                    this.searchQueryIsDirty = false;
-                    console.log("haha");
-                    this.getPatients();
-                }.bind(this))();
-            }, 500),
+            onSearchForPatient:
+              _.debounce(function() {
+                this.getPatients()
+              }, 500)
+            ,
             getPatients() {
                 let self = this;
-                this.isCalculating = true;
+                // this.isCalculating = true;
                 let search_for = self.search_for.trim().toUpperCase();
                 if (search_for == "") {
                     self.possiblePatientTable.length = 0;
                     return;
                 }
                 self.$http.post("/inquiry-patient/", {search_for}).then(res => {
+                    console.log("hitting url");
                     return res.json();
                 }).then(res => {
-                    console.log("Now res is: ", res);
+                    // console.log("Now res is: ", res);
                     console.log("LENGTH is: ", res.length);
-                    console.log(res[0]);
+                    // console.log(res[0]);
                     if (res.length == 0) {
                         self.$message({
                             showClose: true,
@@ -335,11 +332,12 @@
                     }
                     self.possiblePatientTable = res;
                     this.isCalculating = false;
-                }).then(function() {
-                    setTimeout(function(){
-                        self.possiblePatientTable = [];
-                    }, 5000)
                 })
+                // .then(function() {
+                //     setTimeout(function(){
+                //         self.possiblePatientTable = [];
+                //     }, 5000)
+                // })
                 .catch(err => {
                     console.log("Error is ", err);
                 })
