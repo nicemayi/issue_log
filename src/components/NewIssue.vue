@@ -319,7 +319,7 @@
                     return res.json();
                 }).then(res => {
                     // console.log("Now res is: ", res);
-                    console.log("LENGTH is: ", res.length);
+                    console.log("LENGTH is: ", res.length, res);
                     // console.log(res[0]);
                     if (res.length == 0) {
                         self.$message({

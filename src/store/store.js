@@ -29,10 +29,10 @@ export const store = new Vuex.Store({
     }
   },
   mutations: {
-    AUTHENTICATION(state, username, admin) {
-      state.login_user = username;
+    AUTHENTICATION(state, username) {
+      state.login_user = username[0];
       state.is_login = true;
-      state.is_admin = admin ? true : false;
+      state.is_admin = (username[1] == 'true') ? true : false;
       store.commit('load_issues');
     },
     load_issues: state => {
@@ -163,7 +163,7 @@ export const store = new Vuex.Store({
         (res) => {
           Vue.http.get("/is-admin/").then(
             (admin) => {
-              commit("AUTHENTICATION", res.data, admin.json());
+              commit("AUTHENTICATION", [res.data, admin.data]);
             }, (err) => {
               console.log("error", err);
             }
