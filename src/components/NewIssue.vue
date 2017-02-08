@@ -249,7 +249,7 @@
         beforeMount: function() {
             let self = this;
             self.$http.get('/get-clients/').then(function(res){
-                self.searchSuggestions = JSON.parse(res.data);
+                self.searchSuggestions = res.data;
             }, function(err){
             clearImmediate(immediate);onsole.log(err)
             });

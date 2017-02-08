@@ -37,7 +37,7 @@ export const store = new Vuex.Store({
     },
     load_issues: state => {
       Vue.http.get('/related-issues/').then(function (res) {
-        let issues = JSON.parse(res.data);
+        let issues = res.data;
         state.issues = issues;
         // console.log(issues[0].issue_title);
         // console.log("successfully get issues: ", issues);
@@ -45,7 +45,7 @@ export const store = new Vuex.Store({
         console.log("Error in login get-related-issues")
       });
       Vue.http.get('/related-groups/').then(function (res) {
-        let groups = JSON.parse(res.data);
+        let groups = res.data;
         state.groups = groups;
         // console.log(groups);
         // console.log("successfully get groups: ", groups);
@@ -59,7 +59,7 @@ export const store = new Vuex.Store({
       Vue.http.post('/validate-user/', {
         login_form
       }).then(res => {
-        let res_data = JSON.parse(res.data);
+        let res_data = res.data;
         if (res_data.msg == 'success') {
           state.login_user = login_form.input_username;
           state.is_login = true;
@@ -79,13 +79,13 @@ export const store = new Vuex.Store({
     },
     reload: state => {
       Vue.http.get('/related-issues/').then(function (res) {
-        let issues = JSON.parse(res.data);
+        let issues = res.data;
         state.issues = issues;
       }, function (err) {
         console.log("Error in login get-related-issues")
       });
       Vue.http.get('/related-groups/').then(function (res) {
-        let groups = JSON.parse(res.data);
+        let groups = res.data;
         state.groups = groups;
       }, function (err) {
         console.log("Error in login get-related-groups")

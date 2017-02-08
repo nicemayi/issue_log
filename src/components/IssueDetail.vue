@@ -58,7 +58,7 @@
                 </div>
             </div>
             <hr/>
-            <div v-if="groups.length > 0">
+            <div>
                 <h3>Add Department / Send notifications</h3>
                 <hr/>
                 <div>
@@ -172,7 +172,7 @@
                     let input_user = this.current_loggin_user;
                     let issue_number = self.issue_detail.issue_number;
                     self.$http.post('/re-open-issue/', {input_user, issue_number}).then(function(res){
-                        let res_data = JSON.parse(res.data);
+                        let res_data = res.data;
                         console.log("In re-open res: ", res_data);
                         self.$message({
                           message: `You successfully re-opened issue ${issue_number}.`,
@@ -191,7 +191,7 @@
                     let input_user = this.current_loggin_user;
                     let issue_number = self.issue_detail.issue_number;
                     self.$http.post('/close-issue/', {input_user, issue_number}).then(function(res){
-                        let res_data = JSON.parse(res.data);
+                        let res_data = res.data;
                         console.log("In close res: ", res_data);
                         self.$message({
                           message: `You closed issue ${issue_number}`,
