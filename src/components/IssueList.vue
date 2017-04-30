@@ -20,7 +20,6 @@
         </transition>
     </li>
 </template>
-
 <script>
     import IssueDetail from './IssueDetail';
     import moment from 'moment-timezone';

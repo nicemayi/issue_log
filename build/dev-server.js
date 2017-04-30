@@ -54,8 +54,8 @@ app.use(devMiddleware)
 app.use(hotMiddleware)
 
 /////////////////////////////////////////////////////////////////////////
-app.use(proxyMiddleware('/who/', {target: 'http://192.168.10.121:5000'}))
-app.use(proxyMiddleware('/auth-user/', {target: 'http://192.168.10.121:5000'}))
+app.use(proxyMiddleware('/who/', {target: 'http://localhost:5000'}))
+app.use(proxyMiddleware('/auth-user/', {target: 'http://localhost:5000'}))
 app.use(proxyMiddleware('/validate-user/', {target: 'http://localhost:5000'}))
 
 app.use(proxyMiddleware('/open-new-issue/', {target: 'http://localhost:5000'}))
@@ -70,6 +70,8 @@ app.use(proxyMiddleware('/re-open-issue/', {target: 'http://localhost:5000'}))
 app.use(proxyMiddleware('/remove-departments/', {target: 'http://localhost:5000'}))
 app.use(proxyMiddleware('/remove-users/', {target: 'http://localhost:5000'}))
 app.use(proxyMiddleware('/is-admin/', {target: 'http://localhost:5000'}))
+app.use(proxyMiddleware('/get-department-and-heads/', {target: 'http://localhost:5000'}))
+app.use(proxyMiddleware('/who-issue/', {target: 'http://localhost:5000'}))
 /////////////////////////////////////////////////////////////////////////
 
 // serve pure static assets

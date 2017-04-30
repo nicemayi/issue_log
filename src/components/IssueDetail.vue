@@ -30,9 +30,26 @@
                 </h3>
                 <ul>
                     <li v-for="each_comment in issue_detail.comments">
-                        <h4>
+                        <h4 v-if="each_comment.comment_type === 'DEPARTMENT_CLOSE'">
+                            <span
+                                class="label label-info"
+                                style="margin-right: 0.5rem;">
+                                {{each_comment.comment_from_department}} - Close
+                            </span>
                             {{each_comment.commented_time}} updated by {{each_comment.commented_by}} :
                         </h4>
+                        <h4 v-if="each_comment.comment_type === 'CLOSE_ISSUE'">
+                            <span
+                                class="label label-success"
+                                style="margin-right: 0.5rem;">
+                                Issue Closed By {{each_comment.commented_by}}
+                            </span>
+                            {{each_comment.commented_time}} updated by {{each_comment.commented_by}} :
+                        </h4>
+                        <h4 v-else>
+                            {{each_comment.commented_time}} updated by {{each_comment.commented_by}} :
+                        </h4>
+
                         <p>{{each_comment.comment_content}}</p>
                     </li>
                 </ul>
@@ -79,6 +96,7 @@
                             </el-form-item style="float:left;">
                             <el-form-item>
                                 <button :disabled="!validSubmit" type="submit" class="btn btn-primary" @click.stop.prevent="onSubmitStatus">Submit Updates</button>
+                                <button :disabled="!is_head" type="submit" class="btn btn-success" @click.stop.prevent="onDepartmentCloseIssue">Department Close</button>
                                 <button :disabled="!is_admin" type="submit" class="btn btn-danger" @click.stop.prevent="onCloseIssue">Close Issue ?</button>
                             </el-form-item>
                         </el-form>
@@ -127,7 +145,9 @@
                 current_loggin_user: 'get_login_user',
                 is_login: 'get_is_login',
                 is_admin: 'get_is_admin',
-                groups: 'get_groups'
+                is_head: 'get_is_head',
+                groups: 'get_groups',
+                department: 'get_department'
             }),
             validSubmit: function() {
                 let action_content = this.action_content.trim();
@@ -143,8 +163,6 @@
             }
         },
         beforeMount: function() {
-            console.log('issue_detail.departments: ', this.issue_detail.departments);
-            console.log(this.issue_detail.is_closed);
             this.issue_detail.notifications.sort()
             this.issue_detail.departments.sort()
         },
@@ -173,7 +191,7 @@
                     let issue_number = self.issue_detail.issue_number;
                     self.$http.post('/re-open-issue/', {input_user, issue_number}).then(function(res){
                         let res_data = res.data;
-                        console.log("In re-open res: ", res_data);
+                        // console.log("In re-open res: ", res_data);
                         self.$message({
                           message: `You successfully re-opened issue ${issue_number}.`,
                           type: 'success'
@@ -185,14 +203,80 @@
                     });
                 }
             },
+            onDepartmentCloseIssue() {
+                const self = this;
+                console.log('in onDepartmentCloseIssue');
+                let input_user = self.current_loggin_user;
+                let action_content = self.action_content.trim();
+                if (action_content) {
+                    action_content = action_content[0].toUpperCase() + action_content.slice(1, action_content.length);
+                }
+                let issue_number = self.issue_detail.issue_number;
+                let departments = []
+                self.issue_detail.departments.forEach(el => {
+                    departments.push(el);
+                });
+                let notifications = []
+                self.issue_detail.departments.forEach(el => {
+                    notifications.push(el);
+                })
+                let tmp = self.add_department_or_person;
+                let add_department_or_person = [];
+                for (let each of tmp) {
+                    if (!(departments.includes(each) || notifications.includes(each))) {
+                        add_department_or_person.push(each);
+                    }
+                }
+                action_content = `${self.department.toUpperCase()} close issue. ` + action_content;
+                const comment_type = "DEPARTMENT_CLOSE";
+                self.$http.post('/update-issue/', {input_user, action_content, issue_number, add_department_or_person, comment_type}).then(res => {
+                    let res_data = JSON.parse(res.data);
+                    self.$message({
+                        message: `You successfully updated issue ${issue_number}`,
+                        type: 'success'
+                    });
+                    self.reload();
+                    self.action_content = '';
+                    self.add_department_or_person = [];
+                }, err => {
+                    console.log("In submit err: ", err);
+                })
+            },
             onCloseIssue() {
                 if ((this.current_loggin_user) && (this.is_admin)) {
                     let self = this;
                     let input_user = this.current_loggin_user;
                     let issue_number = self.issue_detail.issue_number;
-                    self.$http.post('/close-issue/', {input_user, issue_number}).then(function(res){
+
+                    let action_content = self.action_content.trim();
+                    if (action_content) {
+                        action_content = action_content[0].toUpperCase() + action_content.slice(1, action_content.length);
+                    }
+                    let departments = []
+                    self.issue_detail.departments.forEach(el => {
+                        departments.push(el);
+                    });
+                    let notifications = []
+                    self.issue_detail.departments.forEach(el => {
+                        notifications.push(el);
+                    })
+                    let tmp = self.add_department_or_person;
+                    let add_department_or_person = [];
+                    for (let each of tmp) {
+                        if (departments.includes(each) || notifications.includes(each)) {
+                        } else {
+                            add_department_or_person.push(each);
+                        }
+                    }
+
+                    const updates = {};
+                    if (action_content !== '' || add_department_or_person.length !== 0) {
+                        updates.action_content = action_content;
+                        updates.add_department_or_person = add_department_or_person;
+                    }
+
+                    self.$http.post('/close-issue/', {input_user, issue_number, updates}).then(function(res){
                         let res_data = res.data;
-                        console.log("In close res: ", res_data);
                         self.$message({
                           message: `You closed issue ${issue_number}`,
                           type: 'success'
@@ -237,12 +321,14 @@
                         }
                     }
                     if (action_content == '' && add_department_or_person.length == 0) {
-                        console.log("empty!!!");
+                        // console.log("empty!!!");
+
                     } else {
-                        self.$http.post('/update-issue/', {input_user, action_content, issue_number, add_department_or_person}).then(res => {
-                            console.log(res);
+                        const comment_type = 'NORMAL';
+                        self.$http.post('/update-issue/', { input_user, action_content, issue_number, add_department_or_person, comment_type }).then(res => {
+                            // console.log(res);
                             let res_data = JSON.parse(res.data);
-                            console.log("In submit res: ", res_data);
+                            // console.log("In submit res: ", res_data);
                             self.$message({
                               message: `You successfully updated issue ${issue_number}`,
                               type: 'success'
@@ -279,7 +365,7 @@
                 ];
             },
             handleSelect(item) {
-                console.log(item);
+                // console.log(item);
             }
         }
     }

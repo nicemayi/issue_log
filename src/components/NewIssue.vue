@@ -206,25 +206,8 @@
                     description: '',
                     action: '',
                 },
-                departments_option: [
-                    {
-                        label: "Lab",
-                        value: "Lab"
-                    },
-                    {
-                        label: "Accessioning",
-                        value: "Accessioning"
-                    },
-                    {
-                        label: "Billing",
-                        value: "Billing"
-                    },
-                    {
-                        label: "IT",
-                        value: "IT"
-                    },
-                ]
-            }
+                departments_option: []
+            };
         },
         watch: {
             search_for: function(newVal, oldVal) {
@@ -251,7 +234,24 @@
             self.$http.get('/get-clients/').then(function(res){
                 self.searchSuggestions = res.data;
             }, function(err){
-            clearImmediate(immediate);onsole.log(err)
+                clearImmediate(immediate);
+                console.log(err)
+            });
+
+            self.$http.get('/get-department-and-heads/').then((res) => {
+                const res_obj = res.data;
+                const departments = Object.keys(res_obj).sort();
+                const index = departments.indexOf("Other");
+                if (index > -1) {
+                    departments.splice(index, 1);
+                    departments.push("Other");
+                }
+                for (let each of departments) {
+                    self.departments_option.push({
+                        label: each,
+                        value: each
+                    });
+                }
             });
         },
         methods: {
@@ -272,7 +272,7 @@
                 };
             },
             handleSelect(item) {
-                console.log("Select :", item);
+                // console.log("Select :", item);
             },
             handleSelectClient(item) {
                 let self = this;
@@ -299,7 +299,7 @@
                         type: 'warning'
                     });
                 }
-                console.log(this.selectedPatientTable);
+                // console.log(this.selectedPatientTable);
             },
             onSearchForPatient:
               _.debounce(function() {
@@ -314,13 +314,33 @@
                     self.possiblePatientTable.length = 0;
                     return;
                 }
+                if (/^\d+$/.test(search_for)) {
+                    if (search_for.length === 10) {
+                        self.$http.post("/inquiry-patient/", {search_for}).then(res => {
+                            return res.json();
+                        }).then(res => {
+                            if (res.length == 0) {
+                                self.$message({
+                                    showClose: true,
+                                    message: `No record find for your input : ${this.search_for}`,
+                                    type: 'error'
+                                });
+                                this.showPossiblePatientTable = false;
+                                return;
+                            }
+                            self.possiblePatientTable = res;
+                            this.isCalculating = false;
+                        })
+                        .catch(err => {
+                            console.log("Error is ", err);
+                        });
+                    } else {
+                        return;
+                    }
+                }
                 self.$http.post("/inquiry-patient/", {search_for}).then(res => {
-                    console.log("hitting url");
                     return res.json();
                 }).then(res => {
-                    // console.log("Now res is: ", res);
-                    console.log("LENGTH is: ", res.length, res);
-                    // console.log(res[0]);
                     if (res.length == 0) {
                         self.$message({
                             showClose: true,
@@ -333,19 +353,13 @@
                     self.possiblePatientTable = res;
                     this.isCalculating = false;
                 })
-                // .then(function() {
-                //     setTimeout(function(){
-                //         self.possiblePatientTable = [];
-                //     }, 5000)
-                // })
                 .catch(err => {
                     console.log("Error is ", err);
                 })
-                console.log("in get patients");
             },
             clearAllForm() {
                 let self = this;
-                console.log(self.departments_option)
+                // console.log(self.departments_option)
                 self.showPossiblePatientTable = false;
                 self.showSelectedPatientTable = false;
                 self.searchForClient = '';
@@ -389,7 +403,7 @@
                     self.$message.error('Please select any department you want to notifify.');
                     return;
                 }
-                console.log("issue_from.issue_type: ", issue_from.issue_type);
+                // console.log("issue_from.issue_type: ", issue_from.issue_type);
                 let barcode_array = self.selectedPatientTable.map(el => {return el.julien_barcode});
                 let create_by = self.current_loggin_user;
                 self.$http.post('/open-new-issue/', {
@@ -402,13 +416,15 @@
                     action,
                     create_by
                 }).then(function(res) {
-                    console.log("In response: ", res);
+                    // console.log("In response: ", res);
                     if (res.body == "success") {
                         self.$message({
                           message: 'You opened a new issue.',
                           type: 'success'
                         });
+                        self.$emit('createdNewIssue');
                         self.reload();
+                        self.clearAllForm();
                     } else if (res.body == "fail") {
                         self.$message({
                           message: 'You are trying to submit too fast. Try again in 1 minute laster.',

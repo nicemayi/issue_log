@@ -54,12 +54,26 @@
 
 <template>
     <div class="container">
-        <el-tabs style="width: 100%;">
-            <el-tab-pane label="Existing Issues">
+        <el-tabs style="width: 100%;" v-model="activateName">
+            <el-tab-pane name="existingIssueTab" label="Existing Issues">
                 <div v-if="issues.length > 0">
                     <div class="table-list-header row" style="margin-bottom: 0%; margin-top: 2%;">
                         <div class="col-md-3" style="text-align:left; font-size:130%;">{{num_of_unsolved_issues}} <el-radio class="radio" v-model="radio" label="1"><svg aria-hidden="true" class="octicon octicon-issue-opened" height="16" version="1.1" viewBox="0 0 14 16" width="14"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg> unsolved issues</el-radio></div>
                         <div class="col-md-3" style="text-align:left; font-size:130%;"> {{num_of_closed_issues}} <el-radio class="radio" v-model="radio" label="2"><svg aria-hidden="true" class="octicon octicon-check" height="16" version="1.1" viewBox="0 0 12 16" width="12"><path fill-rule="evenodd" d="M12 5l-8 8-4-4 1.5-1.5L4 10l6.5-6.5z"></path></svg> closed issues</el-radio></div>
+                        <el-button
+                            style="float: right; margin-right: 2rem"
+                            type="primary"
+                            @click.prevent.default="reload_from_daterange">
+                            Search Date
+                        </el-button>
+                        <el-date-picker
+                            style="float: right; margin-right: 0.5rem"
+                            v-model="dateRange"
+                            type="daterange"
+                            align="right"
+                            placeholder="Pick a range"
+                            :picker-options="datePickerOption">
+                        </el-date-picker>
                     </div>
                     <div class="border-right border-bottom border-left well" style="margin-bottom: 0%; margin-top: 1%; margin-left: 0px; border-left: 0px;">
                         <form style="margin-left: 0px;">
@@ -81,24 +95,27 @@
                     <issue-div :issues_prop="filtered_issues"></issue-div>
                     </div>
             </el-tab-pane>
-            <el-tab-pane label="Open New Issue" align="center">
-                <new-issue></new-issue>
+            <el-tab-pane name="newIssueTab" label="Open New Issue" align="center" :disabled="disable_new_issue_tab">
+                <new-issue @createdNewIssue="handleCreatedNewIssue"></new-issue>
             </el-tab-pane>
         </el-tabs>
     </div>
 </template>
 
 <script>
-    import IssueDiv from './IssueDiv'
-    import NewIssue from './NewIssue'
-    import { mapGetters, mapActions} from 'vuex'
+    import IssueDiv from './IssueDiv';
+    import NewIssue from './NewIssue';
+    import { mapGetters, mapActions} from 'vuex';
+    import moment from 'moment';
+
     export default {
         components: {NewIssue, IssueDiv},
         computed: {
             ...mapGetters({
                 current_loggin_user: 'get_login_user',
                 is_login: 'get_is_login',
-                issues: 'get_issues'
+                issues: 'get_issues',
+                disable_new_issue_tab: 'get_disable_new_issue'
             }),
             num_of_closed_issues: function() {
                 return this.issues.filter(el => {
@@ -133,6 +150,37 @@
             return {
                 search_issue_number: '',
                 radio: '1',
+                activateName: 'existingIssueTab',
+                dateRange: '',
+                datePickerOption: {
+                    shortcuts: [{
+                    text: 'Last week',
+                    onClick(picker) {
+                        const end = new Date();
+                        const start = new Date();
+                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                        const _end = moment(end).add(1, 'd').format("YYYY-MM-DD");
+                        const _start = moment(start).format("YYYY-MM-DD");;
+                        picker.$emit('pick', [_start, _end]);
+                    }
+                    }, {
+                    text: 'Last month',
+                    onClick(picker) {
+                        const end = new Date();
+                        const start = new Date();
+                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                        picker.$emit('pick', [start, end]);
+                    }
+                    }, {
+                    text: 'Last 3 months',
+                    onClick(picker) {
+                        const end = new Date();
+                        const start = new Date();
+                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                        picker.$emit('pick', [start, end]);
+                    }
+                    }]
+                }
             }
         },
         beforeMount: function() {
@@ -141,7 +189,21 @@
         methods: {
             ...mapActions({
               authUser: 'authUser',
+              changeIssueDateRange: 'changeIssueDateRange'
             }),
+            reload_from_daterange() {
+                if (!!this.dateRange) {
+                    const [_start, _end] = this.dateRange;
+                    const __start = moment(_start);
+                    const __end = moment(_end);
+                    const start = __start.format("YYYY-MM-DD");
+                    const end = __end.format("YYYY-MM-DD");
+                    this.changeIssueDateRange({ start, end });
+                }
+            },
+            handleCreatedNewIssue() {
+                this.activateName = 'existingIssueTab';
+            },
             handleCommand(command) {
                 if (command == "issue number") {
                     this.issues.sort(this.compare_by_number);

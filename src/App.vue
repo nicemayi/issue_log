@@ -9,11 +9,47 @@
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
         <ul class="nav navbar-nav">
-          <li class="active"><a href='/'>Home Page</a></li>
+          <li class="active"><a href='/'>Home</a></li>
+          <li><a href="/dashboard/">Dashboard</a></li>
+          <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Pending List<span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                  <li><a href="/roche-pending/">Roche Pending List</a></li>
+                  <li><a href="/PendingList/">Vibrant Pending List</a></li>
+              </ul>
+          </li>
+          <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Useful Links <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                  <li><a href="/sample_review/">Sample Review</a></li>
+                  <li><a href="/tobarcodeInformationPage/">Sample Barcode</a></li>
+                  <li><a href="/sysmex-sample-barcode/">Sysmex Sample Barcode</a></li>
+                  <li role="separator" class="divider"></li>
+                  <li><a href="/ESR/" target="_blank">ESR LogSheet</a></li>
+                  <li><a href="/ENA/" target="_blank">ENA resutls</a></li>
+                  <li><a href="/CELIAC/" target="_blank">Celiac results</a></li>
+                  <li role="separator" class="divider"></li>
+                  <li class="dropdown-header">Looking for samples</li>
+                  <li><a id="tsp_pending" href="/TSP/" target="_blank" >aliquot samples for TSP</a></li>
+                  <li><a href="/NS/" target="_blank">No-serum or Phadia only samples</a></li>
+                  <li><a href="/ENA_Positive/" target="_blank">ENA Positive Samples</a></li>
+                  <li><a href="/VG_Pending/" target="_blank">Vibrant Genomics Pending List</a></li>
+                  <li><a href="/Phadia2000_Pending/" target="_blank">Phadia Pending Report</a></li>
+                  <li><a href="/WheatZoomer_Pending/" target="_blank">Wheat-Zoomer Pending Report</a></li>
+                  <li><a href="/TSP_EXTRA_TESTS/" target="_blank">COQ10, RT3 and HIGFI pending report</a></li>
+                  <li><a href="/ANA_Pending/" target="_blank">ANA pending report</a></li>
+                  <li role="separator" class="divider"></li>
+                  <li><a href="/downloadprintlabel/">Download Report Label file</a></li>
+                  <li role="separator" class="divider"></li>
+                  <li><a href="/VA-test-information/">Test Information</a></li>
+              </ul>
+          </li>
+          <li><a href="/inventory/">Inventory</a></li>
+          <li><a href="/issue-log/">Issue Log</a></li>
         </ul>
         <form class="navbar-form navbar-right" v-if="is_login">
-          <div class="form-group active"><a style="color:white;">Hi {{current_loggin_user}}!&nbsp&nbsp&nbsp</a></div>
-          <button type="submit" class="btn btn-success" @click="logout_btn">Sign Out</button>
+          <div class="form-group active"><a href="/profile/" style="color:white;">Hi {{current_loggin_user}}!&nbsp&nbsp&nbsp</a></div>
+          <button type="submit" class="btn btn-success" @click.prevent.default="logout_btn">Sign Out</button>
         </form>
         <form v-else class="navbar-form navbar-right">
           <div class="form-group">
@@ -34,7 +70,7 @@
 
 import Issues from './components/IssuePage';
 import { mapActions, mapGetters } from 'vuex'
-// import { userAuthentication } from './store/actions'
+
 export default {
   name: 'app',
   components: {
@@ -49,7 +85,7 @@ export default {
     }
   },
   created: function() {
-    this.userAuthentication();
+    this.authUser();
   },
 
   computed: {
@@ -62,7 +98,7 @@ export default {
     ...mapActions({
       login: 'login',
       logout: 'logout',
-      userAuthentication: 'userAuthentication'
+      authUser: 'authUser'
     }),
     login_btn() {
       this.$store.dispatch('login', {
@@ -71,7 +107,7 @@ export default {
       });
     },
     logout_btn() {
-      this.logout();
+      this.$store.dispatch('logout');
     }
   }
 }
