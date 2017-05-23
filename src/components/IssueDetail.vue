@@ -2,70 +2,69 @@
 
 </style>
 <template>
-    <div class="well well-lg panel-body">
+    <div class="issue-detail panel-body">
         <div>
-            <h4>
+            <h5>
                 This is a <b style="color: red;">{{issue_detail.issue_type}}</b> issue from client <b style="color: red;">{{issue_detail.client_id}}</b>, opened by <b style="color: red;">{{issue_detail.create_by}}</b> at <b style="color: red;">{{issue_detail.create_time}}</b>
-            </h4>
+            </h5>
         </div>
         <div>
-            <h3>
-                1. Description:
-            </h3>
+            <h5>
+                <b>1. Description:</b>
+            </h5>
             <p>&nbsp&nbsp&nbsp&nbsp{{issue_detail.description}}</p>
         </div>
         <div v-if="issue_detail.barcodes.length > 0">
-            <h3>
-                2. Involved Patient Sample Barcodes:
-            </h3>
+            <h5>
+                <b>2. Involved Patient Sample Barcodes:</b>
+            </h5>
             <div class="btn-group" role="group" aria-label="Basic example">
-                <button type="button" class="btn btn-secondary" style="margin: 1% 2% 1% 2%;" v-for="barcode in issue_detail.barcodes">{{barcode}}</button>
+                <label class="label label-default" style="margin: 1% 2% 1% 2%;" v-for="barcode in issue_detail.barcodes">{{barcode}}</label>
             </div>
         </div>
-        <div v-else><h3>2. No involved patient samples.</h3></div>
+        <div v-else><h5><b>2. No involved patient samples.</b></h5></div>
         <div>
             <div v-if="issue_detail.comments.length > 0">
-                <h3>
-                    3. Comments:
-                </h3>
+                <h5>
+                    <b>3. Comments:</b>
+                </h5>
                 <ul>
                     <li v-for="each_comment in issue_detail.comments">
-                        <h4 v-if="each_comment.comment_type === 'DEPARTMENT_CLOSE'">
+                        <h5 v-if="each_comment.comment_type === 'DEPARTMENT_CLOSE'">
                             <span
-                                class="label label-info"
+                                class="label label-primary"
                                 style="margin-right: 0.5rem;">
                                 {{each_comment.comment_from_department}} - Close
                             </span>
-                            {{each_comment.commented_time}} updated by {{each_comment.commented_by}} :
-                        </h4>
-                        <h4 v-if="each_comment.comment_type === 'CLOSE_ISSUE'">
+                            <b>{{each_comment.commented_time}} updated by {{each_comment.commented_by}} :</b>
+                        </h5>
+                        <h5 v-if="each_comment.comment_type === 'CLOSE_ISSUE'">
                             <span
                                 class="label label-success"
                                 style="margin-right: 0.5rem;">
                                 Issue Closed By {{each_comment.commented_by}}
                             </span>
-                            {{each_comment.commented_time}} updated by {{each_comment.commented_by}} :
-                        </h4>
-                        <h4 v-else>
-                            {{each_comment.commented_time}} updated by {{each_comment.commented_by}} :
-                        </h4>
+                            <b>{{each_comment.commented_time}} updated by {{each_comment.commented_by}} :</b>
+                        </h5>
+                        <h5 v-else>
+                            <b>{{each_comment.commented_time}} updated by {{each_comment.commented_by}} :</b>
+                        </h5>
 
                         <p>{{each_comment.comment_content}}</p>
                     </li>
                 </ul>
             </div>
             <div v-else>
-                <h3>
-                    3. Currently No Comments On This Issue.
-                </h3>
+                <h5>
+                    <b>3. Currently No Comments On This Issue.</b>
+                </h5>
             </div>
         </div>
-        <hr/>
         <div v-if="issue_detail.is_closed == '0'">
             <div>
-                <h3>
-                    Add Update Actions:
-                </h3>
+                <h5>
+                    <b>Add Update Actions:</b>
+                </h5>
                 <div class="form-group">
                     <textarea
                         class="form-control"
@@ -74,10 +73,8 @@
                     </textarea>
                 </div>
             </div>
-            <hr/>
             <div>
-                <h3>Add Department / Send notifications</h3>
-                <hr/>
+                <h5><b>Add Department / Send notifications</b></h5>
                 <div>
                     <div>
                         <el-form ref="form">
@@ -103,8 +100,7 @@
                     </div>
                 </div>
             </div>
-            <br>
-            <br>
+
         </div>
         <div v-if="(issue_detail.is_closed == '1') && (is_admin)">
             <button :disabled="!is_admin" type="submit" class="btn btn-danger" @click.stop.prevent="onReOpenIssue">Re-open Issue ?</button>
@@ -120,7 +116,6 @@
                     <remove-modal :issueNumber="issue_detail.issue_number" :removeModalIndex="'department-' + index" :removeModelUser="each_department" :operator="current_loggin_user"></remove-modal>
                 </span>
             </div>
-            <br/>
             <div v-if="issue_detail.notifications.length > 0">
                 <h5>
                     This issue has been notified to:

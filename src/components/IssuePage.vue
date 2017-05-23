@@ -2,8 +2,12 @@
     .list-group-item {
         margin-top: 0%;
         margin-bottom: 0%;
+        padding: 3px 5px;
     }
-    .well-lg {
+    .panel {
+        margin-bottom:  0%;
+    }
+    .issue-detail {
         text-align:left;
         margin-top: 0%;
         margin-bottom: 0%;
@@ -15,7 +19,7 @@
         font-size:130%;
     }
     .label, label-default {
-        font-size:110%;
+        font-size:85%;
     }
     .badge-btn {
         float: right;
@@ -43,7 +47,7 @@
         position: relative;
         top: -14px;
         padding: 0 10px;
-        background: #f0f0f0;
+        /* background: #f0f0f0;*/
         color: #8c8b8b;
         font-size: 18px;
         -webkit-transform: rotate(60deg);

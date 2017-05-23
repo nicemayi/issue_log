@@ -5,7 +5,7 @@
 <template>
     <div class="border-right border-bottom border-left">
         <ul class="list-group">
-            <issue-list v-for="issue in issues_prop" :issue="issue"><issue-list>
+            <issue-list v-for="issue in issues_prop" :issue="issue"></issue-list>
         </ul>
     </div>
 </template>
