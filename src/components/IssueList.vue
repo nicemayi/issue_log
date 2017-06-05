@@ -11,7 +11,7 @@
                 <span :class="isClosed">&nbsp</span>
                 <span class="label label-default">{{issue.issue_number}}</span>
                 <a  @click="changeShowMe">&nbsp <b>{{issue.title}}</b></a>
-                <span v-for="(value, key) in departments" v-bind:class="value?'label label-default':'label label-danger'" >{{key}} </span>
+                <span v-for="(value, key) in departments" ><div v-bind:class="value?'label label-default':'label label-danger'" >{{key}} </div>&nbsp</span>
                 <button @click="changeShowMe" type="button" class="btn btn-primary btn-xs badge-btn">Comments &nbsp <span class="badge">{{issue.comments.length}}</span></button>
             </div>
             <div style="margin-top: 5px;">
