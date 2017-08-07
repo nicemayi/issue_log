@@ -73,14 +73,14 @@
                         <el-date-picker
                             style="float: right; margin-right: 0.5rem"
                             v-model="dateRange"
-                            type="daterange"
+                            type="daterange" 
                             align="right"
                             placeholder="Pick a range"
                             :picker-options="datePickerOption">
                         </el-date-picker>
                     </div>
                     <div class="border-right border-bottom border-left well" style="margin-bottom: 0%; margin-top: 1%; margin-left: 0px; border-left: 0px;">
-                        <form style="margin-left: 0px;">
+                        <!-- <form style="margin-left: 0px;"> -->
                             <div>
                             <el-dropdown style="float: right;" @command="handleCommand">
                                 <el-button id="order_btn">
@@ -94,7 +94,7 @@
                             </el-dropdown>
                                 <input v-model="search_issue_number" placeholder="Search for issue number or title..." type="text" class="form-control input-lg" style="width: 50%;">
                             </div>
-                        </form>
+                        <!-- </form> -->
                     </div>
                     <issue-div :issues_prop="filtered_issues"></issue-div>
                     </div>
@@ -143,10 +143,11 @@
                         }
                     }
                     let isIncludingNumber = el.issue_number.includes(this.search_issue_number.trim().toUpperCase());
-                    let isIncludingTitle = el.title.includes(this.search_issue_number.trim());
+                    let isIncludingTitle = el.title.toLowerCase().includes(this.search_issue_number.trim().toLowerCase());
+                    let isIncludingDescription = el.description.toLowerCase().includes(this.search_issue_number.trim().toLowerCase());
                     // console.log("isIncludingTitle: ", isIncludingTitle)
                     // let isIncludingTitle = false;
-                    return (isIncludingNumber || isIncludingTitle);
+                    return (isIncludingNumber || isIncludingTitle || isIncludingDescription);
                 });
             }
         },
@@ -155,7 +156,7 @@
                 search_issue_number: '',
                 radio: '1',
                 activateName: 'existingIssueTab',
-                dateRange: '',
+                dateRange: [],
                 datePickerOption: {
                     shortcuts: [{
                     text: 'Last week',
@@ -196,12 +197,18 @@
               changeIssueDateRange: 'changeIssueDateRange'
             }),
             reload_from_daterange() {
-                if (!!this.dateRange) {
+                if (!!this.dateRange[0]) {
                     const [_start, _end] = this.dateRange;
                     const __start = moment(_start);
                     const __end = moment(_end);
                     const start = __start.format("YYYY-MM-DD");
                     const end = __end.format("YYYY-MM-DD");
+                    this.changeIssueDateRange({ start, end });
+                } else {
+                    const _end = moment().add(1, 'd');
+                    const _start = moment(_end.diff(3600*1000*24*30)); 
+                    const start = _start.format("YYYY-MM-DD");
+                    const end = _end.format("YYYY-MM-DD");
                     this.changeIssueDateRange({ start, end });
                 }
             },

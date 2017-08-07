@@ -4,7 +4,7 @@ import moment from 'moment';
 
 Vue.use(Vuex)
 
-const _end = moment().add(1, 'd');;
+const _end = moment().add(1, 'd');
 const _start = moment(_end.diff(3600*1000*24*30));
 const end = _end.format("YYYY-MM-DD");
 const start = _start.format("YYYY-MM-DD");
