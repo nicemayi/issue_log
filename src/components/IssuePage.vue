@@ -200,13 +200,13 @@
                 if (!!this.dateRange[0]) {
                     const [_start, _end] = this.dateRange;
                     const __start = moment(_start);
-                    const __end = moment(_end);
+                    const __end = moment(_end).add(1, 'd');
                     const start = __start.format("YYYY-MM-DD");
                     const end = __end.format("YYYY-MM-DD");
                     this.changeIssueDateRange({ start, end });
                 } else {
                     const _end = moment().add(1, 'd');
-                    const _start = moment(_end.diff(3600*1000*24*30)); 
+                    const _start = moment(_end.diff(3600*1000*24*31)); 
                     const start = _start.format("YYYY-MM-DD");
                     const end = _end.format("YYYY-MM-DD");
                     this.changeIssueDateRange({ start, end });
