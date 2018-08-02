@@ -40,8 +40,8 @@
               v-model="issue_form.description">
             </el-input>
         </el-form-item>
-        <el-form-item label="Actions">
-            <el-input type="textarea" placeholder="Please input any required actions." v-model="issue_form.action"></el-input>
+        <el-form-item label="Extra emails">
+            <el-input placeholder="Please input more emails as needed seperated by ;" v-model="issue_form.extra_email"></el-input>
         </el-form-item>
         <el-form-item label="Department">
             <el-select  style="float: left; width: 100%;" multiple placeholder="Select" v-model="issue_form.department">
@@ -205,6 +205,7 @@
                     department: '',
                     description: '',
                     action: '',
+                    extra_email: ''
                 },
                 departments_option: []
             };
@@ -379,6 +380,7 @@
                     department: '',
                     description: '',
                     action: '',
+                    extra_email: ''
                 };
             },
             forceUpdate() {
@@ -386,7 +388,7 @@
             },
             onSubmit() {
                 let self = this;
-                let {issue_title, issue_from, issue_type, department, description, action} = self.issue_form;
+                let {issue_title, issue_from, issue_type, department, description, action, extra_email} = self.issue_form;
                 if (issue_title.trim() == '') {
                     self.$message.error('Please input issue title.');
                     return;
@@ -414,6 +416,7 @@
                     description,
                     barcode_array,
                     action,
+                    extra_email,
                     create_by
                 }).then(function(res) {
                     // console.log("In response: ", res);
